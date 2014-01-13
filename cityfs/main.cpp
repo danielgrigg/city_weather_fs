@@ -15,12 +15,15 @@
 #include <set>
 #include <fstream>
 #include <sstream>
-#include <map>
 #include <tuple>
+#include "http_kit.h"
+#include "rapidjson/document.h"
+
 using namespace std;
+using namespace rapidjson;
 
 template <typename T>
-void index_map(map<string, T>& xs, vector<string>& index) {
+void index_map(unordered_map<string, T>& xs, vector<string>& index) {
   index.clear();
   index.reserve(xs.size());
   for (auto x : xs) {
@@ -59,7 +62,7 @@ ostream& operator<<(ostream& os, const City& rhs) {
 struct Country {
   string name;
   vector<string> city_names;
-  map<string, City> city_map;
+  unordered_map<string, City> city_map;
 };
 
 ostream& operator<<(ostream& os, const Country& c) {
@@ -70,8 +73,11 @@ ostream& operator<<(ostream& os, const Country& c) {
   return os;
 }
 
-static map<string, Country> g_country_map;
+static unordered_map<string, Country> g_country_map;
 static vector<string> g_country_codes;
+
+// Cache contents on file open
+static unordered_map<string, string> g_open_cache;
 
 enum class Result {
   cityfs_unknown,
@@ -103,7 +109,52 @@ bool path_exists(const string& path) {
   return false;
 }
 
-tuple<string, Result> content_for_path(const string& path) {
+bool read_json(Document& doc, const std::string& input) {
+  return !doc.Parse<0>(input.c_str()).HasParseError();
+}
+
+string weather_content(const string& city) {
+  /*
+   Result<Key, BasicStatus> parse_key(const string& response) {
+   Document document;
+   if (!read_json(document, response)) {
+   return { {}, BasicStatus::error_invalid_json };
+   }
+   printf("response:\n %s", response.c_str());
+   
+   if (!is_key_response(document))  {
+   printf("\ninvalid response\n");
+   return { {}, BasicStatus::error_invalid_response };
+   }
+   
+   const Value& keys = document["keys"];
+   auto& k = keys[SizeType(0)];
+   */
+  
+  auto uri = string("api.openweathermap.org/data/2.5/weather?q=") + city;
+  string response;
+  auto get_result = cov::http_get(uri , {{}}, response);
+  Document doc;
+  if (get_result != 0 || !read_json(doc, response)) {
+    return "weather_unknown";
+  }
+  ostringstream oss;
+  
+  if (!doc["weather"].IsArray() ||
+      !doc["weather"].Size() > 0 ||
+      !doc["weather"][SizeType(0)]["description"].IsString() ||
+      !doc["main"].IsObject() ||
+      !doc["main"]["temp"].IsDouble()) {
+    return "weather_unknown";
+  }
+  
+  auto description = doc["weather"][SizeType(0)]["description"].GetString();
+  auto temperature = doc["main"]["temp"].GetDouble() - 273.15;
+  oss << temperature << ", " << description;
+  return oss.str();
+}
+
+tuple<string, Result> content_for_path(const string& path, bool get_weather=false) {
   auto components = split(path.substr(1), '/');
   auto result = Result::cityfs_unknown;
   if (components.size() > 0) {
@@ -122,7 +173,13 @@ tuple<string, Result> content_for_path(const string& path) {
         if (city_iter != country.city_map.end()) {
           auto city = city_iter->second;
           ostringstream oss;
-          oss << city.name << "\n" << city.latitude << ", " << city.longitude << "\n";
+          oss << city.name << "," << city.latitude << "," << city.longitude;
+          if (get_weather) {
+            oss << "," << weather_content(city.name);
+          } else {
+            oss << "                                      ";
+          }
+          oss << "\n";
           return make_tuple(oss.str(), Result::cityfs_file);
         }
       }
@@ -166,6 +223,13 @@ static int cityfs_open(const char *path, struct fuse_file_info *fi)
   cerr << "OPEN " << path << endl;
   
   if (!path_exists(path)) return -ENOENT;
+  std::string content;
+  Result result;
+  tie(content, result) = content_for_path(path, true);
+  if (result == Result::cityfs_file) {
+    g_open_cache[path] = content;
+  }
+  
   
   /* Only reading allowed. */
   if ((fi->flags & O_ACCMODE) != O_RDONLY) return -EACCES;
@@ -192,13 +256,10 @@ static int cityfs_readdir(const char *path,
   
   auto components = split(path + 1, '/');
   if (components.size() > 0) {
-    for (auto c : components) cout << "component: " << c << endl;
-
     auto country = components[0];
-    cout << "[DEBUG] Reading country '" << country << "'" << endl;
-
+    //    cout << "[DEBUG] Reading country '" << country << "'" << endl;
+    
     for (auto c : g_country_map[country].city_names) {
-      cout << "Filling city " << c << endl;
       filler(buf, c.c_str(), NULL, 0);
     }
     return 0;
@@ -212,21 +273,21 @@ static int cityfs_read(const char *path,
                        off_t offset,
                        fuse_file_info *fi)  {
   cerr << "READ " << path << "(" << size << ")" << endl;
-  string content;
-  Result result;
-  tie(content, result) = content_for_path(path);
-  if (result == Result::cityfs_file) {
-    if (offset >= content.size())  return 0;
-    
-    // trim to available content
-    auto actual_size = offset + size > content.size() ?
-    content.size() - offset :
-    size;
-    memcpy(buf, content.c_str() + offset, actual_size);
-    return static_cast<int>(actual_size);
+
+  auto city_iter = g_open_cache.find(path);
+  if (city_iter == g_open_cache.end()) {
+    cerr << "ERROR Reading open_cache for path " << path << endl;
+    return 0;
   }
+  auto content = city_iter->second;
+  cout << "READ " << content.size() << "B, " << "<" << content << ">\n";
   
-  return 0;
+  if (offset >= content.size())  return 0;
+  
+  // trim to available content
+  auto actual_size = offset + size > content.size() ? content.size() - offset :  size;
+  memcpy(buf, content.c_str() + offset, actual_size);
+  return static_cast<int>(actual_size);
 }
 
 
@@ -237,7 +298,7 @@ static struct fuse_operations cityfs_filesystem_operations = {
   .readdir = cityfs_readdir, /* To provide directory listing.      */
 };
 
-bool parse_cities(const string& path, map<string, Country>& countries) {
+bool parse_cities(const string& path, unordered_map<string, Country>& countries) {
   ifstream ifs;
   ifs.open(path);
   if (!ifs.is_open()) {
@@ -251,7 +312,6 @@ bool parse_cities(const string& path, map<string, Country>& countries) {
     string country_code;
     istringstream iss(line);
     
-    // cout << "Reading line: " << line << endl;
     getline(iss, country_code, ',');
     getline(iss, next.name, ',');
     getline(iss, next.latitude, ',');
@@ -277,15 +337,12 @@ int main(int argc, const char * argv[])
     index_map<City>(country_pair.second.city_map, country_pair.second.city_names);
   }
   
-  for (auto& country_pair : g_country_map) {
-    for (auto c : country_pair.second.city_names) cout << "city: " << c << endl;
-    //cout << country_pair.second << endl;
-  }
-  
-  auto found = path_exists("/AU/Orange");
+  cov::http_global_init();
+  string content;
+  Result result;
+  tie(content,result) = content_for_path("/AU/Brisbane", true);
   
   return fuse_main(argc, (char**)argv, &cityfs_filesystem_operations, NULL);
-  
 }
 
 

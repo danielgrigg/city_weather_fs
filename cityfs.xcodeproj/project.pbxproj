@@ -10,6 +10,7 @@
 		650E06D618839C5B00CE6736 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 650E06D518839C5B00CE6736 /* main.cpp */; };
 		650E06D818839C5B00CE6736 /* cityfs.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 650E06D718839C5B00CE6736 /* cityfs.1 */; };
 		650E06E21883C08B00CE6736 /* cities15k.csv in CopyFiles */ = {isa = PBXBuildFile; fileRef = 650E06DE1883C02400CE6736 /* cities15k.csv */; };
+		650E06E51884874200CE6736 /* http_kit.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 650E06E31884874200CE6736 /* http_kit.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -40,6 +41,23 @@
 		650E06D518839C5B00CE6736 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		650E06D718839C5B00CE6736 /* cityfs.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = cityfs.1; sourceTree = "<group>"; };
 		650E06DE1883C02400CE6736 /* cities15k.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = cities15k.csv; sourceTree = "<group>"; };
+		650E06E31884874200CE6736 /* http_kit.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = http_kit.cpp; sourceTree = "<group>"; };
+		650E06E41884874200CE6736 /* http_kit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = http_kit.h; sourceTree = "<group>"; };
+		650E070E188489E700CE6736 /* allocators.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = allocators.h; sourceTree = "<group>"; };
+		650E070F188489E700CE6736 /* document.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = document.h; sourceTree = "<group>"; };
+		650E0710188489E700CE6736 /* encodedstream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = encodedstream.h; sourceTree = "<group>"; };
+		650E0711188489E700CE6736 /* encodings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = encodings.h; sourceTree = "<group>"; };
+		650E0712188489E700CE6736 /* filereadstream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = filereadstream.h; sourceTree = "<group>"; };
+		650E0713188489E700CE6736 /* filestream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = filestream.h; sourceTree = "<group>"; };
+		650E0714188489E700CE6736 /* filewritestream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = filewritestream.h; sourceTree = "<group>"; };
+		650E0716188489E700CE6736 /* pow10.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pow10.h; sourceTree = "<group>"; };
+		650E0717188489E700CE6736 /* stack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stack.h; sourceTree = "<group>"; };
+		650E0718188489E700CE6736 /* strfunc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = strfunc.h; sourceTree = "<group>"; };
+		650E0719188489E700CE6736 /* prettywriter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = prettywriter.h; sourceTree = "<group>"; };
+		650E071A188489E700CE6736 /* rapidjson.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rapidjson.h; sourceTree = "<group>"; };
+		650E071B188489E700CE6736 /* reader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = reader.h; sourceTree = "<group>"; };
+		650E071C188489E700CE6736 /* stringbuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stringbuffer.h; sourceTree = "<group>"; };
+		650E071D188489E700CE6736 /* writer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = writer.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -56,6 +74,9 @@
 		650E06C918839C5B00CE6736 = {
 			isa = PBXGroup;
 			children = (
+				650E070D188489E700CE6736 /* rapidjson */,
+				650E06E31884874200CE6736 /* http_kit.cpp */,
+				650E06E41884874200CE6736 /* http_kit.h */,
 				650E06DE1883C02400CE6736 /* cities15k.csv */,
 				650E06D418839C5B00CE6736 /* cityfs */,
 				650E06D318839C5B00CE6736 /* Products */,
@@ -77,6 +98,37 @@
 				650E06D718839C5B00CE6736 /* cityfs.1 */,
 			);
 			path = cityfs;
+			sourceTree = "<group>";
+		};
+		650E070D188489E700CE6736 /* rapidjson */ = {
+			isa = PBXGroup;
+			children = (
+				650E070E188489E700CE6736 /* allocators.h */,
+				650E070F188489E700CE6736 /* document.h */,
+				650E0710188489E700CE6736 /* encodedstream.h */,
+				650E0711188489E700CE6736 /* encodings.h */,
+				650E0712188489E700CE6736 /* filereadstream.h */,
+				650E0713188489E700CE6736 /* filestream.h */,
+				650E0714188489E700CE6736 /* filewritestream.h */,
+				650E0715188489E700CE6736 /* internal */,
+				650E0719188489E700CE6736 /* prettywriter.h */,
+				650E071A188489E700CE6736 /* rapidjson.h */,
+				650E071B188489E700CE6736 /* reader.h */,
+				650E071C188489E700CE6736 /* stringbuffer.h */,
+				650E071D188489E700CE6736 /* writer.h */,
+			);
+			name = rapidjson;
+			path = cityfs/rapidjson;
+			sourceTree = "<group>";
+		};
+		650E0715188489E700CE6736 /* internal */ = {
+			isa = PBXGroup;
+			children = (
+				650E0716188489E700CE6736 /* pow10.h */,
+				650E0717188489E700CE6736 /* stack.h */,
+				650E0718188489E700CE6736 /* strfunc.h */,
+			);
+			path = internal;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -131,6 +183,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				650E06E51884874200CE6736 /* http_kit.cpp in Sources */,
 				650E06D618839C5B00CE6736 /* main.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -221,7 +274,10 @@
 					/usr/local/include/osxfuse,
 				);
 				LIBRARY_SEARCH_PATHS = /usr/local/lib;
-				OTHER_LDFLAGS = "-losxfuse";
+				OTHER_LDFLAGS = (
+					"-losxfuse",
+					"-lcurl",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -239,7 +295,10 @@
 					/usr/local/include/osxfuse,
 				);
 				LIBRARY_SEARCH_PATHS = /usr/local/lib;
-				OTHER_LDFLAGS = "-losxfuse";
+				OTHER_LDFLAGS = (
+					"-losxfuse",
+					"-lcurl",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
