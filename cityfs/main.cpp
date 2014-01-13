@@ -7,12 +7,18 @@
 //
 
 #include <iostream>
+#include <fuse.h>
+#include <unordered_map>
+#include <string>
+#include <vector>
+
+using namespace std;
+vector<string> cities = { "Brisbane", "Adelaide", "Sydney", "Melbourne", "Perth", "Hobart", "Canberra", "Darwin" };
 
 int main(int argc, const char * argv[])
 {
-
-  // insert code here...
-  std::cout << "Hello, World!\n";
-    return 0;
+  std::cout << "Starting cityfs!\n";
+  
+  return 0;
 }
 
