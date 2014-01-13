@@ -9,18 +9,29 @@
 /* Begin PBXBuildFile section */
 		650E06D618839C5B00CE6736 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 650E06D518839C5B00CE6736 /* main.cpp */; };
 		650E06D818839C5B00CE6736 /* cityfs.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 650E06D718839C5B00CE6736 /* cityfs.1 */; };
+		650E06E21883C08B00CE6736 /* cities15k.csv in CopyFiles */ = {isa = PBXBuildFile; fileRef = 650E06DE1883C02400CE6736 /* cities15k.csv */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		650E06D018839C5B00CE6736 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
-			dstPath = /usr/share/man/man1/;
+			dstPath = /usr/share/man/man1;
 			dstSubfolderSpec = 0;
 			files = (
 				650E06D818839C5B00CE6736 /* cityfs.1 in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 1;
+		};
+		650E06E11883C07F00CE6736 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 7;
+			files = (
+				650E06E21883C08B00CE6736 /* cities15k.csv in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
 
@@ -28,6 +39,7 @@
 		650E06D218839C5B00CE6736 /* cityfs */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = cityfs; sourceTree = BUILT_PRODUCTS_DIR; };
 		650E06D518839C5B00CE6736 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		650E06D718839C5B00CE6736 /* cityfs.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = cityfs.1; sourceTree = "<group>"; };
+		650E06DE1883C02400CE6736 /* cities15k.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = cities15k.csv; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -44,6 +56,7 @@
 		650E06C918839C5B00CE6736 = {
 			isa = PBXGroup;
 			children = (
+				650E06DE1883C02400CE6736 /* cities15k.csv */,
 				650E06D418839C5B00CE6736 /* cityfs */,
 				650E06D318839C5B00CE6736 /* Products */,
 			);
@@ -76,6 +89,7 @@
 				650E06CE18839C5B00CE6736 /* Sources */,
 				650E06CF18839C5B00CE6736 /* Frameworks */,
 				650E06D018839C5B00CE6736 /* CopyFiles */,
+				650E06E11883C07F00CE6736 /* CopyFiles */,
 			);
 			buildRules = (
 			);
