@@ -12,7 +12,7 @@ to Linux.
 
 ## Acknowledgements
 
-openweathermap.org - weather data
-rapidjson (https://code.google.com/p/rapidjson/) for JSON parsing
-libcurl (http://curl.haxx.se/libcurl/) http networking
+* openweathermap.org - weather data
+* rapidjson (https://code.google.com/p/rapidjson/) for JSON parsing
+* libcurl (http://curl.haxx.se/libcurl/) http networking
 
