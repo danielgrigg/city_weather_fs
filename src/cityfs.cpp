@@ -319,6 +319,7 @@ bool parse_cities(const string& path, unordered_map<string, Country>& countries)
     getline(iss, next.population, ',');
     getline(iss, next.timezone, ',');
     
+    next.name += ".txt";
     countries[country_code].city_map.insert(make_pair(next.name, next));
     countries[country_code].name = country_code;
   }
@@ -338,9 +339,6 @@ int main(int argc, const char * argv[])
   }
   
   cov::http_global_init();
-  string content;
-  Result result;
-  tie(content,result) = content_for_path("/AU/Brisbane", true);
   
   return fuse_main(argc, (char**)argv, &cityfs_filesystem_operations, NULL);
 }
