@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 2.6)
 set(PROJ cityfs)
-set(CMAKE_INSTALL_PREFIX "." CACHE PATH "${PROJ} install prefix" FORCE)
+set(CMAKE_INSTALL_PREFIX "" CACHE PATH "${PROJ} install prefix" FORCE)
+set (COVSO_VERSION_MAJOR 1)
+set (COVSO_VERSION_MINOR 0)
+set (COVSO_VERSION_PATCH 0)
+set (COVSO_VERSION ${COVSO_VERSION_MAJOR}.${COVSO_VERSION_MINOR}.${COVSO_VERSION_PATCH})
 
 project(${PROJ})
 set(CMAKE_CXX_FLAGS "-std=c++11 -stdlib=libc++")
