@@ -1,12 +1,16 @@
 cmake_minimum_required(VERSION 2.6)
 set(PROJ cityfs)
 set(CMAKE_INSTALL_PREFIX "." CACHE PATH "${PROJ} install prefix" FORCE)
+
 project(${PROJ})
 set(CMAKE_CXX_FLAGS "-std=c++11 -stdlib=libc++")
+add_definitions( -D_FILE_OFFSET_BITS=64)
 include_directories(.)
 set(SOURCES)
 set(SOURCES ${SOURCES} src/cityfs.cpp)
 set(SOURCES ${SOURCES} src/http_kit.cpp)
 add_executable(${PROJ} ${SOURCES})
+target_link_libraries(${PROJ} curl)
+target_link_libraries(${PROJ} osxfuse)
 install (TARGETS ${PROJ} DESTINATION bin)
 

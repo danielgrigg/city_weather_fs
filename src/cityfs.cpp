@@ -6,6 +6,9 @@
 //  Copyright (c) 2014 Daniel Grigg. All rights reserved.
 //
 
+
+#define FUSE_USE_VERSION 26
+
 #include <iostream>
 #include <fuse.h>
 #include <unordered_map>
@@ -140,11 +143,11 @@ string weather_content(const string& city) {
   }
   ostringstream oss;
   
-  if (!doc["weather"].IsArray() ||
-      !doc["weather"].Size() > 0 ||
-      !doc["weather"][SizeType(0)]["description"].IsString() ||
-      !doc["main"].IsObject() ||
-      !doc["main"]["temp"].IsDouble()) {
+  if (!(doc["weather"].IsArray() &&
+      doc["weather"].Size() > 0 &&
+      doc["weather"][SizeType(0)]["description"].IsString() &&
+      doc["main"].IsObject() &&
+      doc["main"]["temp"].IsDouble())) {
     return "weather_unknown";
   }
   
