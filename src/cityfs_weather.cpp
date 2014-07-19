@@ -1,12 +1,12 @@
 
 #include "cityfs_weather.hpp"
-#include "http_kit.h"
+#include "http_kit.hpp"
 #include "rapidjson/document.h"
 #include <sstream>
 
 using namespace rapidjson;
 using namespace std;
-using namespace cov;
+using namespace citynet;
 
 namespace cityfs {
 
@@ -15,13 +15,13 @@ namespace cityfs {
   }
 
   void weather_init() {
-    cov::http_global_init();
+    http_global_init();
   }
 
   string weather_content(const string& city) {
     auto uri = string("api.openweathermap.org/data/2.5/weather?q=") + city;
     string response;
-    auto get_result = cov::http_get(uri , {{}}, response);
+    auto get_result = http_get(uri , {{}}, response);
     Document doc;
     if (get_result != 0 || !read_json(doc, response)) {
       return "weather_unknown";

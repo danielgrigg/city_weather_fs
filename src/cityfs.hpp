@@ -10,8 +10,8 @@
 #include <fstream>
 #include <sstream>
 #include <tuple>
-
 #include "country_codes.hpp"
+#include "cityfs_util.hpp"
 
 namespace cityfs {
 
@@ -52,7 +52,7 @@ namespace cityfs {
     std::unordered_map<std::string, City> city_map;
   };
 
-  std::ostream& operator<<(std::ostream& os, const Country& c) {
+  inline std::ostream& operator<<(std::ostream& os, const Country& c) {
     os << c.name << ":" << std::endl;
     for (auto city_pair : c.city_map) {
       os << city_pair.second << std::endl;
@@ -60,26 +60,35 @@ namespace cityfs {
     return os;
   }
 
-  inline std::string country_to_real_path(
-      CountryCodeMap& index,
-      const std::string& country_code) {
-    auto iter = index.code_to_country.find(country_code);
-    if (iter != index.code_to_country.end()) {
-      return iter->second;  
-    }
-    return country_code;
-  }
+  typedef std::unordered_map<std::string, Country> CountryMap;
 
-  inline std::string real_path_to_country(
-      CountryCodeMap& index,
-      const std::string& country) {
+  std::string country_to_real_path(
+      const CountryCodeMap& index,
+      const std::string& country_code);
 
-    auto iter = index.country_to_code.find(country);
-    if (iter != index.code_to_country.end()) {
-      return iter->second;  
-    }
-    return country;
-  }
+  std::string real_path_to_country(
+      const CountryCodeMap& index,
+      const std::string& country);
+
+  bool parse_cities(
+      const std::string& path, 
+      std::unordered_map<std::string, Country>& countries);
+
+
+  // Check if a real-path maps to a virtual cityfs path.
+  bool virtual_path_exists(
+      const CountryMap& country_map,
+      const CountryCodeMap& country_code_map, 
+      const std::string& real_path);
+
+  // Get the content for a file.
+  // For cityfs, the real-path will always be of the form,
+  // /$country/$city.txt
+  std::tuple<std::string, Result> content_for_path(
+      const CountryMap& country_map,
+      const CountryCodeMap& country_code_map,
+      const std::string& real_path, 
+      bool get_weather=false);
 }
 
 #endif

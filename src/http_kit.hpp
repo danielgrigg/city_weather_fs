@@ -1,10 +1,10 @@
-#ifndef INCLUDE_COV_HTTP_KIT
-#define INCLUDE_COV_HTTP_KIT
+#ifndef INCLUDE_CITYNET_HTTP_KIT
+#define INCLUDE_CITYNET_HTTP_KIT
 
 #include <string>
 #include <map>
 
-namespace cov {
+namespace citynet {
 
 void http_global_init(bool verbose = false);
 void http_global_destroy();
@@ -30,6 +30,4 @@ int http_put(const std::string& url,
 const char* http_error_str( int code);
 
 }
-
 #endif
-
