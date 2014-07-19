@@ -26,11 +26,11 @@ using namespace std;
 using namespace rapidjson;
 
 template <typename T>
-void index_map(unordered_map<string, T>& xs, vector<string>& index) {
+void index_map(unordered_map<string, T>& items, vector<string>& index) {
   index.clear();
-  index.reserve(xs.size());
-  for (auto x : xs) {
-    index.push_back(x.first);
+  index.reserve(items.size());
+  for (auto item : items) {
+    index.push_back(item.first);
   }
 }
 
@@ -330,20 +330,37 @@ bool parse_cities(const string& path, unordered_map<string, Country>& countries)
   return true;
 }
 
-int main(int argc, const char * argv[])
-{
-  cout << "Starting cityfs..." << endl;
-  
-  if (!parse_cities("cities15k.csv", g_country_map)) return 1;
+
+int main(int argc, const char * argv[]) {
+
+  if (argc < 3) {
+    cout << "Usage: " << argv[0] << " [city-file] [mount-point] \n\n";
+    cout << "city-file must be a csv of (country-code,city,lat,lng,elevation,region)\n\n";
+    cout << "  For example:\n";
+    cout << "    $ cityfs cities15k.csv ~/cities \n\n";
+    cout << "  Where cities15k.csv looks like:\n";
+    cout << "    AU,Gold Coast,-28.00029,153.43088,591473,Australia/Brisbane\n";
+    cout << "    AU,Gladstone,-23.84761,151.25635,30489,Australia/Brisbane\n";
+    cout << "    AU,Geelong,-38.14711,144.36069,226034,Australia/Melbourne\n";
+    return 1;
+  } 
+  auto city_file = argv[1];
+  auto mount_point = argv[2];
+
+  if (!parse_cities(city_file, g_country_map)) return 1;
+
   index_map<Country>(g_country_map, g_country_codes);
   
   for (auto& country_pair : g_country_map) {
-    index_map<City>(country_pair.second.city_map, country_pair.second.city_names);
+    index_map<City>(country_pair.second.city_map, 
+        country_pair.second.city_names);
   }
   
   cov::http_global_init();
   
-  return fuse_main(argc, (char**)argv, &cityfs_filesystem_operations, NULL);
+  cout << "Mounting cityfs..." << endl;
+  const char* argv_fused[] = {argv[0], argv[2], "-f"};
+  cout << "sizeof argv_fused[] " << sizeof(argv_fused) << endl;
+  return fuse_main(3, (char**)argv_fused, &cityfs_filesystem_operations, NULL);
 }
-
 
