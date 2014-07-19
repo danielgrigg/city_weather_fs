@@ -1,46 +1,33 @@
-//
-//  main.cpp
-//  cityfs
-//
-//  Created by Daniel Grigg on 13/01/2014.
 //  Copyright (c) 2014 Daniel Grigg. All rights reserved.
 //
 
 #define FUSE_USE_VERSION 26
 
 #include <fuse.h>
-#include "http_kit.h"
-#include "rapidjson/document.h"
 #include "cityfs_util.hpp"
 #include "cityfs.hpp"
+#include "cityfs_weather.hpp"
 
 using namespace std;
-using namespace rapidjson;
 using namespace cityfs;
 using namespace cityfs::util;
 
 
-
+// Cache contents on file open
+static unordered_map<string, string> g_open_cache;
 static CountryCodeMap g_country_code_map;
 static unordered_map<string, Country> g_country_map;
 static vector<string> g_country_codes;
 
-// Cache contents on file open
-static unordered_map<string, string> g_open_cache;
 
-enum class Result {
-  cityfs_unknown,
-  cityfs_file,
-  cityfs_directory
-};
+// Check if a real-path maps to a virtual cityfs path.
+bool virtual_path_exists(const string& real_path) {
 
-bool virtual_path_exists(const string& path) {
-  auto components = split(path.substr(1), '/');
+  auto components = split(real_path.substr(1), '/');
   if (components.size() > 0) {
     
-    // Files look like /AU/Brisbane, /AU/Sydney, ...
-    auto code = real_path_to_country(g_country_code_map, 
-        components[0]);
+    // Files look like /Australia/Brisbane.txt, /Australia/Sydney.txt, ...
+    auto code = real_path_to_country(g_country_code_map, components[0]);
     auto country_iter = g_country_map.find(code);
     if (country_iter != g_country_map.end()) {
       auto country = country_iter->second;
@@ -59,34 +46,6 @@ bool virtual_path_exists(const string& path) {
     }
   }
   return false;
-}
-
-bool read_json(Document& doc, const std::string& input) {
-  return !doc.Parse<0>(input.c_str()).HasParseError();
-}
-
-string weather_content(const string& city) {
-  auto uri = string("api.openweathermap.org/data/2.5/weather?q=") + city;
-  string response;
-  auto get_result = cov::http_get(uri , {{}}, response);
-  Document doc;
-  if (get_result != 0 || !read_json(doc, response)) {
-    return "weather_unknown";
-  }
-  ostringstream oss;
-  
-  if (!(doc["weather"].IsArray() &&
-      doc["weather"].Size() > 0 &&
-      doc["weather"][SizeType(0)]["description"].IsString() &&
-      doc["main"].IsObject() &&
-      doc["main"]["temp"].IsDouble())) {
-    return "weather_unknown";
-  }
-  
-  auto description = doc["weather"][SizeType(0)]["description"].GetString();
-  auto temperature = doc["main"]["temp"].GetDouble() - 273.15;
-  oss << temperature << ", " << description;
-  return oss.str();
 }
 
 
@@ -224,9 +183,9 @@ static int cityfs_read(const char *path,
   cerr << "READ " << path << "(" << size << ")" << endl;
   auto virtual_path = real_path_to_city(path); 
 
-  auto city_iter = g_open_cache.find(virtual_path);
+  auto city_iter = g_open_cache.find(path);
   if (city_iter == g_open_cache.end()) {
-    cerr << "ERROR Reading open_cache for virtual_path " << virtual_path << endl;
+    cerr << "ERROR Reading open_cache for path " << path << endl;
     return 0;
   }
   auto content = city_iter->second;
@@ -305,11 +264,12 @@ int main(int argc, const char * argv[]) {
     index_map<City>(country_pair.second.city_map, 
         country_pair.second.city_names);
   }
-  
-  cov::http_global_init();
+ 
+  weather_init(); 
   
   cout << "Mounting cityfs..." << endl;
 
+  // Add flags to argv_fused for debugging, eg, {"-d", "-f"};
   const char* argv_fused[] = {argv[0], argv[2]};
   int argc_fused = sizeof(argv_fused) / sizeof(char*);
 

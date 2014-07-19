@@ -15,6 +15,12 @@
 
 namespace cityfs {
 
+  enum class Result {
+    cityfs_unknown,
+    cityfs_file,
+    cityfs_directory
+  };
+
   struct City {
     std::string name;
     std::string latitude;
