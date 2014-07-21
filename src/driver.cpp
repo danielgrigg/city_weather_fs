@@ -13,49 +13,49 @@ using namespace cityfs;
 using namespace cityfs::util;
 
 
-static unordered_map<string, string> g_open_cache;
-static vector<string> g_country_codes;
-static CountryCodeMap g_country_code_map;
+static unordered_map<string, string> open_cache;
+static vector<string> country_codes;
+static CountryCodeMap country_code_map;
 
 // Cache contents on file open. The cache works on 'real-paths'.
-static CountryMap g_country_map;
+static CountryMap country_map;
 
 /// handle getting file attributes
-static int cityfs_getattr(const char *real_path,
-                          struct stat *stbuf) {
-  cerr << "GETATTR " << real_path << endl;
+static int cityfs_getattr(const char *path, 
+    struct stat *stbuf) {
+
+  cerr << "GETATTR " << path << endl;
   memset(stbuf, 0, sizeof(struct stat));
-  
-  // The root directory of our file system.
-  if (string(real_path) == "/") {
-    stbuf->st_mode = S_IFDIR | 0755;
-    stbuf->st_nlink = 3;
-    return 0;
-  }
-
   string content;
-  Result result;
-
-  // don't get the weather for statting the file
-  // this also implies content sizes will vary on read.
-  tie(content, result) = content_for_path(
-      g_country_map,
-      g_country_code_map,
-      real_path, 
-      false);
-  if (result == Result::cityfs_directory ) {
+  PathMatch result;
+  
+  // Matched the root directory
+  if (string(path) == "/") {
     stbuf->st_mode = S_IFDIR | 0755;
     stbuf->st_nlink = 3;
     return 0;
   }
 
-  if (result == Result::cityfs_file) {
+  // Query the path against our city-db.
+  tie(content, result) = content_for_path(country_map, 
+      country_code_map, path, false);
+
+  // Matched a country, return a directory.
+  if (result == PathMatch::cityfs_country ) {
+    stbuf->st_mode = S_IFDIR | 0755;
+    stbuf->st_nlink = 3;
+    return 0;
+  }
+
+  // Matched a city
+  if (result == PathMatch::cityfs_city) {
     stbuf->st_mode = S_IFREG | 0444;
     stbuf->st_nlink = 1;
     stbuf->st_size = content.length();
     return 0;
   }
-  
+
+  // Nothing matched
   return 0;
 }
 
@@ -65,19 +65,19 @@ static int cityfs_open(const char *real_path, struct fuse_file_info *fi)
   cerr << "OPEN " << real_path << endl;
 
   string path_str = real_path;
-  if (!virtual_path_exists( g_country_map, g_country_code_map, path_str)) { 
+  if (!virtual_path_exists( country_map, country_code_map, path_str)) { 
     return -ENOENT;
   }
 
   std::string content;
-  Result result;
+  PathMatch result;
   tie(content, result) = content_for_path(
-      g_country_map,
-      g_country_code_map,
+      country_map,
+      country_code_map,
       path_str, 
       true);
-  if (result == Result::cityfs_file) {
-    g_open_cache[path_str] = content;
+  if (result == PathMatch::cityfs_city) {
+    open_cache[path_str] = content;
   }
   
   /* Only reading allowed. */
@@ -88,32 +88,32 @@ static int cityfs_open(const char *real_path, struct fuse_file_info *fi)
 
 
 // handle reading a directory
-static int cityfs_readdir(const char *real_path,
+static int cityfs_readdir(const char *cpath,
                           void *buf,
                           fuse_fill_dir_t filler,
                           off_t offset,
                           fuse_file_info *fi)  {
-  cerr << "READDIR " << real_path << endl;
-  string virtual_path = real_path;
+  string path = cpath;
+  cerr << "READDIR " << path << endl;
   
   filler(buf, ".", NULL, 0);
   filler(buf, "..", NULL, 0);
 
-  if (virtual_path == "/") {
-    for (auto code : g_country_codes) {
-      auto country = country_to_real_path(g_country_code_map, code);
+  if (path == "/") {
+    for (auto code : country_codes) {
+      auto country = country_to_real_path(country_code_map, code);
       filler(buf, country.c_str(), NULL, 0);
     }
     return 0;
   }
   
-  auto virtual_path_noroot = virtual_path.substr(1);
-  auto components = split(virtual_path_noroot, '/');
+  auto relative = path.substr(1);
+  auto components = split(relative, '/');
   if (components.size() > 0) {
     auto code = real_path_to_country(
-        g_country_code_map,
+        country_code_map,
         components[0]);
-    for (auto c : g_country_map[code].city_names) {
+    for (auto c : country_map[code].city_names) {
       filler(buf, city_to_real_path(c).c_str(), NULL, 0);
     }
     return 0;
@@ -130,8 +130,8 @@ static int cityfs_read(const char *real_path,
   cerr << "READ " << real_path << "(" << size << ")" << endl;
   auto virtual_path = real_path_to_city(real_path); 
 
-  auto city_iter = g_open_cache.find(real_path);
-  if (city_iter == g_open_cache.end()) {
+  auto city_iter = open_cache.find(real_path);
+  if (city_iter == open_cache.end()) {
     cerr << "ERROR Reading open_cache for real_path " << real_path << endl;
     return 0;
   }
@@ -171,13 +171,13 @@ int main(int argc, const char * argv[]) {
   auto city_file = argv[1];
   auto mount_point = argv[2];
 
-  if (!parse_cities(city_file, g_country_map)) return 1;
+  if (!parse_cities(city_file, country_map)) return 1;
 
-  g_country_code_map = all_country_codes();
+  country_code_map = all_country_codes();
 
-  index_map<Country>(g_country_map, g_country_codes);
+  index_map<Country>(country_map, country_codes);
   
-  for (auto& country_pair : g_country_map) {
+  for (auto& country_pair : country_map) {
     index_map<City>(country_pair.second.city_map, 
         country_pair.second.city_names);
   }

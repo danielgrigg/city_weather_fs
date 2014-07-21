@@ -15,10 +15,10 @@
 
 namespace cityfs {
 
-  enum class Result {
+  enum class PathMatch {
     cityfs_unknown,
-    cityfs_file,
-    cityfs_directory
+    cityfs_city,
+    cityfs_country
   };
 
   struct City {
@@ -84,7 +84,7 @@ namespace cityfs {
   // Get the content for a file.
   // For cityfs, the real-path will always be of the form,
   // /$country/$city.txt
-  std::tuple<std::string, Result> content_for_path(
+  std::tuple<std::string, PathMatch> content_for_path(
       const CountryMap& country_map,
       const CountryCodeMap& country_code_map,
       const std::string& real_path, 

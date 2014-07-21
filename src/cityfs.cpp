@@ -97,14 +97,14 @@ bool virtual_path_exists(
 // Get the content for a file.
 // For cityfs, the real-path will always be of the form,
 // /$country/$city.txt
-tuple<string, Result> content_for_path(
+tuple<string, PathMatch> content_for_path(
     const CountryMap& country_map,
     const CountryCodeMap& country_code_map,
     const string& real_path, 
     bool get_weather) {
 
   auto components = split(real_path.substr(1), '/');
-  auto result = Result::cityfs_unknown;
+  auto result = PathMatch::cityfs_unknown;
   if (components.size() > 0) {
     
     // Files look like /Australia/Brisbane.txt
@@ -120,7 +120,7 @@ tuple<string, Result> content_for_path(
       auto country = country_iter->second;
       
       if (components.size() == 1) {
-        return make_tuple("", Result::cityfs_directory);
+        return make_tuple("", PathMatch::cityfs_country);
       }
 
       if (components.size() == 2) {
@@ -138,7 +138,7 @@ tuple<string, Result> content_for_path(
             oss << "                                      ";
           }
           oss << "\n";
-          return make_tuple(oss.str(), Result::cityfs_file);
+          return make_tuple(oss.str(), PathMatch::cityfs_city);
         }
       }
     }
