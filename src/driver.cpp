@@ -60,29 +60,25 @@ static int cityfs_getattr(const char *path,
 }
 
 // handle opening files
-static int cityfs_open(const char *path, struct fuse_file_info *fi)
-{
+static int cityfs_open(const char *cpath, 
+    fuse_file_info *fi) {
+  string path = cpath;
   cerr << "OPEN " << path << endl;
+  std::string content;
+  PathMatch result;
 
-  string path_str = path;
-  if (!virtual_path_exists( country_map, country_code_map, path_str)) { 
+  if (!virtual_path_exists( country_map, country_code_map, path)) { 
     return -ENOENT;
   }
 
-  std::string content;
-  PathMatch result;
-  tie(content, result) = content_for_path(
-      country_map,
-      country_code_map,
-      path_str, 
-      true);
+  tie(content, result) = content_for_path(country_map, 
+      country_code_map, path, true);
+
   if (result == PathMatch::cityfs_city) {
-    open_cache[path_str] = content;
+    open_cache[path] = content;
   }
   
-  /* Only reading allowed. */
   if ((fi->flags & O_ACCMODE) != O_RDONLY) return -EACCES;
-  
   return 0;
 }
 
@@ -148,7 +144,20 @@ static int cityfs_read(const char *path,
 
 
 static struct fuse_operations cityfs_filesystem_operations = {
-  .getattr = cityfs_getattr, /* To provide size, permissions, etc. */
+  .getattr = cityfs_getattr, /* To provide size, permissions, etc. */  if (!virtual_path_exists( country_map, country_code_map, path)) { 
+    return -ENOENT;
+  }
+
+  tie(content, result) = content_for_path(country_map, 
+      country_code_map, path_str, true);
+
+  if (result == PathMatch::cityfs_city) {
+    open_cache[path_str] = content;
+  }
+  
+  if ((fi->flags & O_ACCMODE) != O_RDONLY) return -EACCES;
+  return 0;
+
   .open    = cityfs_open,    /* To enforce read-only access.       */
   .read    = cityfs_read,    /* To provide file content.           */
   .readdir = cityfs_readdir, /* To provide directory listing.      */
