@@ -11,7 +11,7 @@ using namespace std;
 using namespace cityfs::util;
 
 
-string country_to_real_path(
+string country_to_path(
       const CountryCodeMap& index,
       const string& country_code) {
     auto iter = index.code_to_country.find(country_code);
@@ -21,7 +21,7 @@ string country_to_real_path(
     return country_code;
   }
 
-string real_path_to_country(
+string path_to_country(
       const CountryCodeMap& index,
       const string& country) {
 
@@ -66,13 +66,13 @@ bool parse_cities(const string& path,
 bool virtual_path_exists(
     const CountryMap& country_map,
     const CountryCodeMap& country_code_map, 
-    const string& real_path) {
+    const string& path) {
 
-  auto components = split(real_path.substr(1), '/');
+  auto components = split(path.substr(1), '/');
   if (components.size() > 0) {
     
     // Files look like /Australia/Brisbane.txt, /Australia/Sydney.txt, ...
-    auto code = real_path_to_country(country_code_map, components[0]);
+    auto code = path_to_country(country_code_map, components[0]);
     auto country_iter = country_map.find(code);
     if (country_iter != country_map.end()) {
       auto country = country_iter->second;
@@ -82,7 +82,7 @@ bool virtual_path_exists(
         return true;
       }
       if (components.size() > 1) {
-        auto city_name = real_path_to_city(components[1]);
+        auto city_name = path_to_city(components[1]);
         auto city_iter = country.city_map.find(city_name);
         if (city_iter != country.city_map.end()) {
           return true;
@@ -100,10 +100,10 @@ bool virtual_path_exists(
 tuple<string, PathMatch> content_for_path(
     const CountryMap& country_map,
     const CountryCodeMap& country_code_map,
-    const string& real_path, 
+    const string& path, 
     bool get_weather) {
 
-  auto components = split(real_path.substr(1), '/');
+  auto components = split(path.substr(1), '/');
   auto result = PathMatch::cityfs_unknown;
   if (components.size() > 0) {
     
@@ -111,7 +111,7 @@ tuple<string, PathMatch> content_for_path(
     auto country_name = components[0];
 
     // The virtual fs works with country codes.
-    auto country_code = real_path_to_country(
+    auto country_code = path_to_country(
         country_code_map,
         country_name);
 
@@ -124,7 +124,7 @@ tuple<string, PathMatch> content_for_path(
       }
 
       if (components.size() == 2) {
-        auto city_name = real_path_to_city(components[1]);
+        auto city_name = path_to_city(components[1]);
 
         auto city_iter = country.city_map.find(city_name);
 

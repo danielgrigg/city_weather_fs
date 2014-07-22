@@ -29,11 +29,11 @@ namespace cityfs {
     std::string timezone;
   };
 
-  inline std::string city_to_real_path(const std::string& name) { 
+  inline std::string city_to_path(const std::string& name) { 
     return name + ".txt"; 
   }
 
-  inline std::string real_path_to_city(const std::string& path) {
+  inline std::string path_to_city(const std::string& path) {
     return util::trim_extension(path);
   }
 
@@ -62,11 +62,11 @@ namespace cityfs {
 
   typedef std::unordered_map<std::string, Country> CountryMap;
 
-  std::string country_to_real_path(
+  std::string country_to_path(
       const CountryCodeMap& index,
       const std::string& country_code);
 
-  std::string real_path_to_country(
+  std::string path_to_country(
       const CountryCodeMap& index,
       const std::string& country);
 
@@ -79,7 +79,7 @@ namespace cityfs {
   bool virtual_path_exists(
       const CountryMap& country_map,
       const CountryCodeMap& country_code_map, 
-      const std::string& real_path);
+      const std::string& path);
 
   // Get the content for a file.
   // For cityfs, the real-path will always be of the form,
@@ -87,7 +87,7 @@ namespace cityfs {
   std::tuple<std::string, PathMatch> content_for_path(
       const CountryMap& country_map,
       const CountryCodeMap& country_code_map,
-      const std::string& real_path, 
+      const std::string& path, 
       bool get_weather=false);
 }
 

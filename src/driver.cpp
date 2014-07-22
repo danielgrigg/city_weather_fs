@@ -56,15 +56,15 @@ static int cityfs_getattr(const char *path,
   }
 
   // Nothing matched
-  return 0;
+  return -ENOENT;
 }
 
 // handle opening files
-static int cityfs_open(const char *real_path, struct fuse_file_info *fi)
+static int cityfs_open(const char *path, struct fuse_file_info *fi)
 {
-  cerr << "OPEN " << real_path << endl;
+  cerr << "OPEN " << path << endl;
 
-  string path_str = real_path;
+  string path_str = path;
   if (!virtual_path_exists( country_map, country_code_map, path_str)) { 
     return -ENOENT;
   }
@@ -101,7 +101,7 @@ static int cityfs_readdir(const char *cpath,
 
   if (path == "/") {
     for (auto code : country_codes) {
-      auto country = country_to_real_path(country_code_map, code);
+      auto country = country_to_path(country_code_map, code);
       filler(buf, country.c_str(), NULL, 0);
     }
     return 0;
@@ -109,12 +109,12 @@ static int cityfs_readdir(const char *cpath,
   
   auto relative = path.substr(1);
   auto components = split(relative, '/');
-  if (components.size() > 0) {
-    auto code = real_path_to_country(
-        country_code_map,
-        components[0]);
-    for (auto c : country_map[code].city_names) {
-      filler(buf, city_to_real_path(c).c_str(), NULL, 0);
+
+  // First directory is the country
+  if (components.size() == 1) {
+    auto code = path_to_country(country_code_map, components[0]);
+    for (auto city : country_map[code].city_names) {
+      filler(buf, city_to_path(city).c_str(), NULL, 0);
     }
     return 0;
   }
@@ -122,17 +122,17 @@ static int cityfs_readdir(const char *cpath,
 }
 
 // handle reading a file
-static int cityfs_read(const char *real_path,
+static int cityfs_read(const char *path,
                        char *buf,
                        size_t size,
                        off_t offset,
                        fuse_file_info *fi)  {
-  cerr << "READ " << real_path << "(" << size << ")" << endl;
-  auto virtual_path = real_path_to_city(real_path); 
+  cerr << "READ " << path << "(" << size << ")" << endl;
+  auto virtual_path = path_to_city(path); 
 
-  auto city_iter = open_cache.find(real_path);
+  auto city_iter = open_cache.find(path);
   if (city_iter == open_cache.end()) {
-    cerr << "ERROR Reading open_cache for real_path " << real_path << endl;
+    cerr << "ERROR Reading open_cache for path " << path << endl;
     return 0;
   }
   auto content = city_iter->second;
