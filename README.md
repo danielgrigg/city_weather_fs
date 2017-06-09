@@ -17,7 +17,7 @@ get here [OSXFuse](http://osxfuse.github.io).
 
 ### Linux  
 
-    sudo apt-get install libfuse-dev
+    sudo apt-get install libcurl4-openssl-dev libfuse-dev
 
 ### Windows  
 
