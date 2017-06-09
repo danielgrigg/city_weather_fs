@@ -6,6 +6,8 @@ language: cpp
 
 compiler:
   - gcc
+
+dist: trusty
   
 script:
   - mkdir build
