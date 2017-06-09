@@ -10,6 +10,10 @@ using namespace citynet;
 
 namespace cityfs {
 
+  // This is a public, rate-limited key so I can't guarantee it'll 
+  // stay available.  You can obtain a free key here http://openweathermap.org/appid
+  const std::string OpenWeatherMapKey = "4e23be0473684c5e1c69ebb3252f35a4";
+
   bool read_json(Document& doc, const std::string& input) {
     return !doc.Parse<0>(input.c_str()).HasParseError();
   }
@@ -19,7 +23,7 @@ namespace cityfs {
   }
 
   string weather_content(const string& city) {
-    auto uri = string("api.openweathermap.org/data/2.5/weather?q=") + city;
+    auto uri = string("api.openweathermap.org/data/2.5/weather?q=") + city + "&appid=" + OpenWeatherMapKey;
     string response;
     auto get_result = http_get(uri , {{}}, response);
     Document doc;

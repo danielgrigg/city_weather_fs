@@ -57,7 +57,7 @@ Once it's running, take try reading the file-tree under your mount-point.
 ## Code Layout
 
 All the code is standard C++11.  CMake is used for builds.  There's no 
-tests cause this is a POC, otherwise I'd look at Bandit cause gtest is a turd.
+tests cause this is a POC ;)
 
 + driver.cpp - FUSE related code
 + cityfs.x - model the city FS
