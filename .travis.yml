@@ -1,0 +1,14 @@
+sudo: required
+before_install:
+  - sudo apt-get install  libcurl4-openssl-dev libfuse-dev
+  
+language: cpp
+
+compiler:
+  - gcc
+  
+script:
+  - mkdir build
+  - cd build
+  - cmake .. && make
+
