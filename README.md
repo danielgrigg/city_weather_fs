@@ -5,8 +5,9 @@ FUSE for the weather of cities across the globe.
 Demonstrates the simplicity of creating a virtual filesystem 
 using FUSE and hopefully inspires people to 'FUSE all the things!'.
 
-Checkout the associated blog post at [CityFS](http://danielgrigg.github.io)!
+Checkout the associated blog post at [CityFS](https://danielgrigg.com/post/2014-07-23-virtual-file-systems-with-fuse/).
 
+[![Build Status](https://travis-ci.org/danielgrigg/city_weather_fs.svg?branch=master)](https://travis-ci.org/danielgrigg/city_weather_fs)
 
 ## Installing
 
