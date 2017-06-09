@@ -7,6 +7,7 @@
 #include "cityfs.hpp"
 #include "cityfs_util.hpp"
 #include "cityfs_weather.hpp"
+#include <string.h>
 
 using namespace std;
 using namespace cityfs;
@@ -145,16 +146,14 @@ static int cityfs_read(const char *path,
   return static_cast<int>(actual_size);
 }
 
-
-static struct fuse_operations cityfs_filesystem_operations = {
-  .getattr = cityfs_getattr, /* To provide size, permissions, etc. */
-  .open    = cityfs_open,    /* To enforce read-only access.       */
-  .read    = cityfs_read,    /* To provide file content.           */
-  .readdir = cityfs_readdir, /* To provide directory listing.      */
-};
-
+struct fuse_operations cityfs_filesystem_operations;
 
 int main(int argc, const char * argv[]) {
+
+  cityfs_filesystem_operations.getattr = cityfs_getattr;
+  cityfs_filesystem_operations.open = cityfs_open;
+  cityfs_filesystem_operations.read = cityfs_read;
+  cityfs_filesystem_operations.readdir = cityfs_readdir;
 
   if (argc < 3) {
     cout << "Usage: " << argv[0] << " [city-file] [mount-point] \n\n";

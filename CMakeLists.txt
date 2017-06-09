@@ -1,13 +1,12 @@
 cmake_minimum_required(VERSION 2.6)
 set(PROJ cityfs)
-set(CMAKE_INSTALL_PREFIX "" CACHE PATH "${PROJ} install prefix" FORCE)
 set (COVSO_VERSION_MAJOR 1)
 set (COVSO_VERSION_MINOR 0)
 set (COVSO_VERSION_PATCH 0)
 set (COVSO_VERSION ${COVSO_VERSION_MAJOR}.${COVSO_VERSION_MINOR}.${COVSO_VERSION_PATCH})
 
 project(${PROJ})
-set(CMAKE_CXX_FLAGS "-std=c++11 -stdlib=libc++")
+set(CMAKE_CXX_FLAGS "-std=c++11")
 add_definitions( -D_FILE_OFFSET_BITS=64)
 include_directories(.)
 set(SOURCES)
@@ -17,7 +16,15 @@ set(SOURCES ${SOURCES} src/country_codes.cpp)
 set(SOURCES ${SOURCES} src/cityfs_weather.cpp)
 set(SOURCES ${SOURCES} src/driver.cpp)
 add_executable(${PROJ} ${SOURCES})
-target_link_libraries(${PROJ} curl)
-target_link_libraries(${PROJ} osxfuse)
+
+# Just supporting Linux and MacOS for now.
+if(APPLE) 
+  message(STATUS "Apple build...")
+  target_link_libraries(${PROJ} curl osxfuse)
+else()
+  message(STATUS "Non-Apple build...")
+  target_link_libraries(${PROJ} curl fuse pthread)
+endif()
+
 install (TARGETS ${PROJ} DESTINATION bin)
 

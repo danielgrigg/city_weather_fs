@@ -10,14 +10,20 @@ Checkout the associated blog post at [CityFS](http://danielgrigg.github.io)!
 
 ## Installing
 
-You'll need an updated FUSE installation.  Whilst the code 
-is cross-platform thanks to C++ & CMake, I've only tested 
-on OSX so far.  On Mac, you can install [OSXFuse](http://osxfuse.github.io) 
-or get it from your favourite package manager. Linux should be an
-apt-get away.  Unfortunately for Windows, FUSE support is lacking.
-There's some OSS efforts but you'll probably want to look at 
-either writing your own Mini driver or a commercial solution 
-like CBFS.
+### MacOS
+
+MacOS You'll need an updated FUSE installation which you can
+get here [OSXFuse](http://osxfuse.github.io).   
+
+### Linux  
+
+    sudo apt-get install libfuse-dev
+
+### Windows  
+
+Unfortunately FUSE support is lacking.  There's some OSS efforts but you'll 
+probably want to look at either writing your own Mini driver 
+or a commercial solution like CBFS.
 
 
 ### Build the driver
